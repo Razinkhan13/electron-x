@@ -3,22 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Electron-X | Autonomous EV Empire Bangladesh</title>
-    <!-- CSS & Libraries -->
+    <title>Electron-X | Autonomous EV Distribution Bangladesh</title>
+    <!-- Professional CDNs -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;900&display=swap');
-        body { font-family: 'Inter', sans-serif; background-color: #020617; }
-        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.05); }
-        input[type="range"]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            height: 20px; width: 20px; border-radius: 50%; background: #06b6d4; cursor: pointer;
-            box-shadow: 0 0 15px rgba(6, 182, 212, 0.5);
-        }
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #030712; color: #f8fafc; scroll-behavior: smooth; }
+        .glass-panel { background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .accent-gradient { background: linear-gradient(135deg, #22d3ee 0%, #34d399 100%); }
+        .text-gradient { background: linear-gradient(135deg, #22d3ee 0%, #34d399 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        input[type="range"] { -webkit-appearance: none; background: #1e293b; height: 6px; border-radius: 999px; }
+        input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; background: #22d3ee; border-radius: 50%; cursor: pointer; box-shadow: 0 0 15px rgba(34, 211, 238, 0.5); }
     </style>
 </head>
 <body>
@@ -26,128 +25,186 @@
 
     <script type="text/babel">
         const { useState, useMemo, useEffect } = React;
-        
-        // Lucide Icon Component Wrapper
-        const Icon = ({ name, className }) => {
-            useEffect(() => { lucide.createIcons(); }, [name]);
-            return <i data-lucide={name} className={className}></i>;
+
+        // Custom Icon Component for Lucide
+        const Icon = ({ name, size = 20, className = "" }) => {
+            useEffect(() => { if (window.lucide) window.lucide.createIcons(); }, [name]);
+            return <i data-lucide={name} style={{ width: size, height: size }} className={className}></i>;
         };
 
         const App = () => {
-            const [monthlyKm, setMonthlyKm] = useState(1800);
-            const [activeTab, setActiveTab] = useState('economics');
-            const [agentIdx, setAgentIdx] = useState(0);
+            const [view, setView] = useState('home');
+            const [km, setKm] = useState(2000);
 
-            // Market Data
-            const DATA = { petrol: 125, electricity: 12, iceMaint: 1200, evMaint: 150 };
+            // Market Intelligence Data (Research-Backed)
+            const RESEARCH = {
+                petrol: 125.0,        // BDT/Liter (Current BD)
+                electricity: 12.5,    // BDT/Unit (Commercial Tier)
+                iceMaint: 1400,       // Monthly Oil/Service
+                evMaint: 180,         // Monthly Digital/Software
+                iceEfficiency: 40,    // KM/L
+                evEfficiency: 35,     // KM/Unit
+                taxHoliday: "10 Years", // NBR SRO 149
+            };
 
             const savings = useMemo(() => {
-                const petrol = (monthlyKm / 40) * DATA.petrol + DATA.iceMaint;
-                const ev = (monthlyKm / 35) * DATA.electricity + DATA.evMaint;
-                return { 
-                    monthly: Math.round(petrol - ev), 
-                    yearly: Math.round((petrol - ev) * 12) 
-                };
-            }, [monthlyKm]);
+                const iceCost = (km / RESEARCH.iceEfficiency) * RESEARCH.petrol + RESEARCH.iceMaint;
+                const evCost = (km / RESEARCH.evEfficiency) * RESEARCH.electricity + RESEARCH.evMaint;
+                const diff = iceCost - evCost;
+                return { monthly: Math.round(diff), yearly: Math.round(diff * 12), fiveYear: Math.round(diff * 60) };
+            }, [km]);
 
-            const swarm = [
-                { name: "Sentinel-1", role: "Market Scout", desc: "Mines 5,000+ leads from social sentiment AI.", tech: "Python/Llama 3" },
-                { name: "Nexus-AI", role: "Sales Closer", desc: "Handles 1,000+ WhatsApp leads via GPT-4o.", tech: "OpenAI/Twilio" },
-                { name: "Guardian", role: "Fleet Monitor", desc: "Predicts battery health via IoT sensors.", tech: "TensorFlow" }
-            ];
+            const Navigation = () => (
+                <nav className="fixed top-0 w-full z-[100] glass-panel border-b border-white/5 px-6 h-20 flex items-center justify-between">
+                    <div className="flex items-center gap-3 cursor-pointer" onClick={() => setView('home')}>
+                        <div className="w-10 h-10 accent-gradient rounded-xl flex items-center justify-center shadow-lg"><Icon name="zap" className="text-black" /></div>
+                        <div>
+                            <span className="text-xl font-extrabold tracking-tighter uppercase block leading-none">ELECTRON<span className="text-cyan-400">X</span></span>
+                            <span className="text-[8px] font-bold text-slate-500 tracking-[0.4em] uppercase">Autonomous Mobility</span>
+                        </div>
+                    </div>
+                    <div className="hidden md:flex gap-8 text-[10px] font-black tracking-widest text-slate-400 uppercase">
+                        {['home', 'economics', 'swarm', 'roadmap'].map(tab => (
+                            <button key={tab} onClick={() => setView(tab)} className={`hover:text-cyan-400 transition-all ${view === tab ? 'text-cyan-400 border-b-2 border-cyan-400 pb-1' : ''}`}>{tab}</button>
+                        ))}
+                    </div>
+                    <button className="bg-white text-black px-6 py-2 rounded-full text-[10px] font-black uppercase hover:bg-cyan-400 hover:text-white transition-all">Investor Login</button>
+                </nav>
+            );
 
             return (
-                <div className="min-h-screen text-slate-100 pb-20">
-                    {/* Navigation */}
-                    <nav className="fixed top-0 w-full z-50 glass border-b border-white/5 h-20 px-6 flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 bg-cyan-500 rounded-xl flex items-center justify-center shadow-lg shadow-cyan-500/30">
-                                <Icon name="zap" className="text-black w-6 h-6" />
-                            </div>
-                            <span className="text-xl font-black tracking-tighter uppercase">Electron<span className="text-cyan-500">X</span></span>
-                        </div>
-                        <div className="hidden md:flex gap-8 text-[10px] font-black tracking-widest text-slate-400">
-                            <button onClick={() => setActiveTab('economics')} className={activeTab === 'economics' ? 'text-cyan-400' : ''}>ECONOMICS</button>
-                            <button onClick={() => setActiveTab('swarm')} className={activeTab === 'swarm' ? 'text-cyan-400' : ''}>AGI SWARM</button>
-                            <button onClick={() => setActiveTab('roadmap')} className={activeTab === 'roadmap' ? 'text-cyan-400' : ''}>ROADMAP</button>
-                        </div>
-                    </nav>
+                <div className="min-h-screen">
+                    <Navigation />
 
-                    {/* Hero Section */}
-                    <header className="pt-40 px-6 text-center mb-24 max-w-5xl mx-auto">
-                        <div className="inline-flex items-center gap-2 px-3 py-1 bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-[10px] font-black rounded-full mb-6">
-                            <Icon name="activity" className="w-3 h-3" /> LIVE FROM DHAKA/SYLHET
+                    {/* --- HOME VIEW --- */}
+                    {view === 'home' && (
+                        <div className="pt-40 px-6 max-w-7xl mx-auto text-center animate-in fade-in duration-700">
+                            <div className="inline-flex items-center gap-2 px-4 py-1 bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-[10px] font-black rounded-full mb-8">
+                                <Icon name="shield" size={14} /> VERIFIED BY BD EV POLICY 2024
+                            </div>
+                            <h1 className="text-6xl md:text-9xl font-extrabold tracking-tighter mb-8 leading-[0.8] uppercase italic">
+                                Zero Cash. <br/><span className="text-gradient">Unlimited Alpha.</span>
+                            </h1>
+                            <p className="max-w-3xl mx-auto text-slate-400 text-lg md:text-xl font-medium mb-12">
+                                Solving the ৳125/L fuel crisis by deploying an AGI-managed dealership network. We trade <span className="text-white underline decoration-cyan-500 decoration-2">Market Intelligence</span> for Investor Capital.
+                            </p>
+                            <div className="flex flex-col md:flex-row justify-center gap-4">
+                                <button onClick={() => setView('economics')} className="px-10 py-4 accent-gradient text-black font-black rounded-2xl shadow-xl shadow-cyan-500/20 hover:scale-105 transition-all uppercase text-xs">Explore Economics</button>
+                                <button onClick={() => setView('swarm')} className="px-10 py-4 glass-panel text-white font-black rounded-2xl border border-white/10 hover:bg-white/5 transition-all uppercase text-xs">View AGI Swarm</button>
+                            </div>
                         </div>
-                        <h1 className="text-6xl md:text-8xl font-black tracking-tighter mb-8 leading-[0.8] uppercase italic">
-                            Zero Capital.<br/><span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-emerald-400">Total Dominance.</span>
-                        </h1>
-                        <p className="text-slate-400 text-lg max-w-2xl mx-auto">
-                            Transforming the ৳125/L fuel crisis into an autonomous business empire. We trade AGI intelligence for physical capital.
-                        </p>
-                    </header>
-
-                    {/* Economics Section */}
-                    {activeTab === 'economics' && (
-                        <section className="max-w-7xl mx-auto px-6 grid lg:grid-cols-2 gap-12 items-center">
-                            <div className="space-y-8">
-                                <h2 className="text-4xl font-black italic uppercase">The <span className="text-red-500">Fuel</span> Suffering</h2>
-                                <div className="p-8 glass rounded-[2.5rem]">
-                                    <div className="flex justify-between mb-4">
-                                        <span className="text-xs font-bold text-slate-500">Monthly Commute</span>
-                                        <span className="text-xl font-black text-cyan-400">{monthlyKm} KM</span>
-                                    </div>
-                                    <input type="range" min="500" max="5000" step="100" value={monthlyKm} onChange={(e) => setMonthlyKm(e.target.value)} className="w-full h-1 bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-cyan-500" />
-                                </div>
-                                <p className="text-slate-400">By shifting to Electron-X, you eliminate maintenance and high-cost petrol, generating wealth from thin air.</p>
-                            </div>
-                            <div className="bg-gradient-to-br from-cyan-600 to-emerald-700 p-12 rounded-[3rem] text-black">
-                                <span className="text-[10px] font-black uppercase opacity-60">Yearly Wealth Accumulation</span>
-                                <div className="text-6xl font-black italic mb-4">৳{savings.yearly.toLocaleString()}</div>
-                                <div className="p-4 bg-black/10 rounded-2xl text-xs font-bold">"Switching is not a luxury; it is the only way to beat inflation."</div>
-                            </div>
-                        </section>
                     )}
 
-                    {/* Swarm Section */}
-                    {activeTab === 'swarm' && (
-                        <section className="max-w-7xl mx-auto px-6 grid lg:grid-cols-12 gap-8">
-                            <div className="lg:col-span-4 space-y-4">
-                                {swarm.map((agent, i) => (
-                                    <button key={i} onClick={() => setAgentIdx(i)} className={`w-full p-6 text-left rounded-3xl border ${agentIdx === i ? 'bg-cyan-500/10 border-cyan-500' : 'bg-transparent border-white/5'}`}>
-                                        <div className="font-black text-sm uppercase">{agent.name}</div>
-                                        <div className="text-[10px] text-slate-500 font-bold">{agent.role}</div>
-                                    </button>
+                    {/* --- ECONOMICS VIEW --- */}
+                    {view === 'economics' && (
+                        <div className="pt-32 px-6 max-w-7xl mx-auto grid lg:grid-cols-2 gap-16 animate-in slide-in-from-bottom duration-500">
+                            <div className="space-y-8">
+                                <h2 className="text-5xl font-extrabold italic uppercase leading-none">The Price of <span className="text-red-500">Suffering</span></h2>
+                                <p className="text-slate-400 text-lg">In Bangladesh, fuel is a variable cost that ruins family budgets. We quantify the freedom of switching to Electron-X.</p>
+                                <div className="p-10 glass-panel rounded-[3rem]">
+                                    <div className="flex justify-between items-center mb-6">
+                                        <span className="text-xs font-black uppercase text-slate-500">Monthly Usage (KM)</span>
+                                        <span className="text-3xl font-black text-cyan-400 italic">{km} KM</span>
+                                    </div>
+                                    <input type="range" min="500" max="5000" step="100" value={km} onChange={(e) => setKm(parseInt(e.target.value))} className="w-full" />
+                                </div>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="p-6 bg-red-500/5 border border-red-500/10 rounded-3xl">
+                                        <div className="text-[10px] font-black uppercase text-red-500 mb-2">Petrol Cost/mo</div>
+                                        <div className="text-2xl font-black italic tracking-tighter text-red-100">৳{((km/RESEARCH.iceEfficiency)*RESEARCH.petrol + RESEARCH.iceMaint).toLocaleString()}</div>
+                                    </div>
+                                    <div className="p-6 bg-emerald-500/5 border border-emerald-500/10 rounded-3xl">
+                                        <div className="text-[10px] font-black uppercase text-emerald-500 mb-2">EV Cost/mo</div>
+                                        <div className="text-2xl font-black italic tracking-tighter text-emerald-100">৳{((km/RESEARCH.evEfficiency)*RESEARCH.electricity + RESEARCH.evMaint).toLocaleString()}</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="relative">
+                                <div className="accent-gradient p-12 rounded-[4rem] text-black shadow-2xl h-full flex flex-col justify-between">
+                                    <div>
+                                        <h4 className="text-[10px] font-black uppercase tracking-[0.3em] mb-2 opacity-60">5-Year Wealth Accumulation</h4>
+                                        <div className="text-7xl md:text-8xl font-black italic tracking-tighter leading-none mb-6">৳{savings.fiveYear.toLocaleString()}</div>
+                                        <p className="text-sm font-bold max-w-xs leading-relaxed opacity-80 italic">"This is not just a saving; it's a seed fund for your children's future education or your next business."</p>
+                                    </div>
+                                    <div className="mt-12 flex gap-4">
+                                        <div className="px-5 py-2 bg-black/10 rounded-full text-[10px] font-black uppercase">0% Emissions</div>
+                                        <div className="px-5 py-2 bg-black/10 rounded-full text-[10px] font-black uppercase">100% Assurance</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* --- AGI SWARM VIEW --- */}
+                    {view === 'swarm' && (
+                        <div className="pt-32 px-6 max-w-7xl mx-auto">
+                            <div className="text-center mb-16">
+                                <h2 className="text-5xl font-extrabold uppercase italic mb-4 text-gradient">The AGI Swarm</h2>
+                                <p className="text-slate-500 text-xs font-black uppercase tracking-[0.5em]">Minimal Human. Maximum Efficiency.</p>
+                            </div>
+                            <div className="grid md:grid-cols-3 gap-8">
+                                {[
+                                    { n: "Sentinel-1", r: "Lead Gen Bot", d: "Mines 5,000+ leads by monitoring fuel frustration social clusters in BD.", t: "Python/Llama 3/Scrapy" },
+                                    { n: "Nexus-AI", r: "Autonomous Sales", d: "Handles 1k+ concurrent WhatsApp conversations using human behavior empathy.", t: "OpenAI/Twilio/RAG" },
+                                    { n: "Guardian-IoT", r: "Fleet Sentry", d: "Monitors battery degradation and triggers swapping subscriptions automatically.", t: "TensorFlow/MQTT" }
+                                ].map((agent, i) => (
+                                    <div key={i} className="p-10 glass-panel rounded-[3rem] border border-white/5 hover:border-cyan-400/30 transition-all group">
+                                        <div className="w-12 h-12 rounded-2xl bg-cyan-500/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform"><Icon name="cpu" className="text-cyan-400" /></div>
+                                        <h4 className="text-xl font-black uppercase mb-2">{agent.n}</h4>
+                                        <p className="text-[10px] font-black text-cyan-500 mb-6 uppercase tracking-widest">{agent.r}</p>
+                                        <p className="text-sm text-slate-400 leading-relaxed mb-8">{agent.d}</p>
+                                        <div className="text-[9px] font-mono text-slate-600 bg-black/40 p-3 rounded-xl border border-white/5 uppercase">{agent.t}</div>
+                                    </div>
                                 ))}
                             </div>
-                            <div className="lg:col-span-8 glass p-10 rounded-[3rem]">
-                                <h3 className="text-3xl font-black uppercase italic mb-4">{swarm[agentIdx].role}</h3>
-                                <p className="text-slate-400 text-lg mb-8 leading-relaxed">{swarm[agentIdx].desc}</p>
-                                <div className="inline-block px-4 py-2 bg-white/5 rounded-full text-[10px] font-black text-cyan-400">TECH: {swarm[agentIdx].tech}</div>
+                        </div>
+                    )}
+
+                    {/* --- ROADMAP VIEW --- */}
+                    {view === 'roadmap' && (
+                        <div className="pt-32 px-6 max-w-7xl mx-auto">
+                            <h2 className="text-5xl font-extrabold text-center uppercase italic mb-16 underline decoration-cyan-500/20 underline-offset-8">12-Month Accumulation</h2>
+                            <div className="grid md:grid-cols-4 gap-4">
+                                {[
+                                    { p: "01", t: "Data Mining", c: "৳0", d: "Gather 5,000 leads and incorporate legal entity with NBR Tax relief." },
+                                    { p: "02", t: "Equity JV", c: "৳85L", d: "Trade data for capital. Partner builds the 3S hub in Dhaka/Sylhet." },
+                                    { p: "03", t: "OEM Integration", c: "৳1.5Cr", d: "Open L/C for Ather/Ola batch 1. Sync AGI Nexus with India APIs." },
+                                    { p: "04", t: "Auto-Franchise", c: "Royalty", d: "Franchise the model to 64 districts using AGI for training/audit." }
+                                ].map((step, i) => (
+                                    <div key={i} className="p-8 glass-panel rounded-[2.5rem] relative overflow-hidden group">
+                                        <div className="absolute top-2 right-4 text-6xl font-black text-white/5 italic">{step.p}</div>
+                                        <h4 className="text-lg font-black uppercase mb-4 group-hover:text-cyan-400 transition-colors">{step.t}</h4>
+                                        <p className="text-sm text-slate-500 leading-relaxed mb-6 italic">"{step.d}"</p>
+                                        <div className="p-3 bg-white/5 rounded-2xl flex justify-between items-center">
+                                            <span className="text-[9px] font-black text-slate-600 uppercase">Partner Cost</span>
+                                            <span className="text-xs font-black text-emerald-400">{step.c}</span>
+                                        </div>
+                                    </div>
+                                ))}
                             </div>
-                        </section>
+                        </div>
                     )}
 
-                    {/* Roadmap Section */}
-                    {activeTab === 'roadmap' && (
-                        <section className="max-w-7xl mx-auto px-6 grid md:grid-cols-4 gap-4">
-                            {[
-                                { t: "Phase 1", d: "Data Scouting & RJSC Incorporation.", c: "৳0" },
-                                { t: "Phase 2", d: "Secure Partner for 3S Experience Hub.", c: "Partner Funded" },
-                                { t: "Phase 3", d: "OEM Inventory (Ather/Ola) L/C Open.", c: "৳1.5Cr" },
-                                { t: "Phase 4", d: "Autonomous Franchise Scaling.", c: "Royalty" }
-                            ].map((step, i) => (
-                                <div key={i} className="p-8 glass rounded-[2.5rem]">
-                                    <div className="text-cyan-500 font-black mb-4">{step.t}</div>
-                                    <p className="text-xs text-slate-500 mb-6">{step.d}</p>
-                                    <div className="text-[10px] font-black uppercase p-2 bg-white/5 text-center rounded-xl">{step.c}</div>
+                    {/* --- FOOTER --- */}
+                    <footer className="py-24 mt-20 border-t border-white/5 text-center bg-black/40">
+                        <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-12 items-center">
+                            <div className="text-left">
+                                <div className="flex items-center gap-3 mb-4">
+                                    <Icon name="zap" className="text-cyan-500" />
+                                    <span className="text-2xl font-black tracking-tighter uppercase">ELECTRON-X</span>
                                 </div>
-                            ))}
-                        </section>
-                    )}
-
-                    {/* Footer */}
-                    <footer className="mt-32 border-t border-white/5 py-12 text-center">
-                        <div className="text-[10px] text-slate-700 font-black tracking-[0.5em] uppercase">ELECTRON-X | AUTONOMOUS BD NODE 2026</div>
+                                <p className="text-[10px] text-slate-600 font-bold uppercase tracking-[0.4em] max-w-sm leading-relaxed">
+                                    Autonomous Infrastructure Node 0xBD-2026. Zero Human Friction. Zero Capital Required for the Vision.
+                                </p>
+                            </div>
+                            <div className="flex gap-4">
+                                <div className="flex-1 p-6 glass-panel rounded-3xl text-left">
+                                    <div className="text-[10px] font-black text-slate-600 uppercase mb-1">Founder Equity</div>
+                                    <div className="text-2xl font-black italic">25% LOCKED</div>
+                                </div>
+                                <button className="px-10 py-2 accent-gradient text-black rounded-3xl text-[10px] font-black uppercase tracking-widest hover:scale-105 transition-all">Start Phase 1</button>
+                            </div>
+                        </div>
                     </footer>
                 </div>
             );
